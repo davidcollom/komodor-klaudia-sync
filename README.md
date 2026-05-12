@@ -7,6 +7,9 @@ It supports two remote file types:
 - `knowledge-base`
 - `blueprint`
 
+For content guidance and structure expectations, see the Komodor reference:
+https://help.komodor.com/hc/en-us/articles/32463600112786-Klaudia-md-Organizational-Blueprint-Knowledge
+
 ## What It Does
 
 - uploads new files
@@ -75,6 +78,7 @@ The CLI also reads these environment variables:
 Build and run locally:
 
 ```bash
+go build -o klaudia-sync ./cmd/klaudia-sync
 docker build -t klaudia-sync-action .
 
 docker run --rm \
@@ -83,6 +87,8 @@ docker run --rm \
   -e KLAUDIA_FILE_TYPE=knowledge-base \
   -v "$PWD:/workspace" \
   klaudia-sync-action
+
+rm -f klaudia-sync
 ```
 
 ## GitHub Action

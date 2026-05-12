@@ -4,7 +4,9 @@ project_name: komodor-klaudia-sync
 before:
   hooks:
     - go mod tidy
+    - go mod download
     - go test ./...
+    - go generate ./...
 
 builds:
   - id: komodor-klaudia-sync
@@ -34,15 +36,16 @@ checksum:
   name_template: checksums.txt
 
 dockers_v2:
-  - id: komodor-klaudia-sync-image
-    ids:
-      - komodor-klaudia-sync
-    images:
-      - ghcr.io/davidcollom/komodor-klaudia-sync:v{{ .Version }}
-      - ghcr.io/davidcollom/komodor-klaudia-sync:v{{ .Major }}
-      - ghcr.io/davidcollom/komodor-klaudia-sync:v{{ .Major }}.{{ .Minor }}
-      - "{{ if not .Prerelease }}ghcr.io/davidcollom/komodor-klaudia-sync:latest{{ end }}"
-    dockerfile: Dockerfile
+  - images:
+      - ghcr.io/davidcollom/komodor-klaudia-sync
+    platforms:
+      - linux/arm64
+      - linux/amd64
+    tags:
+      - v{{ .Version }}
+      - v{{ .Major }}
+      - v{{ .Major }}.{{ .Minor }}
+      - "{{ if not .Prerelease }}latest{{ end }}"
     labels:
       org.opencontainers.image.title: "komodor-klaudia-sync"
       org.opencontainers.image.source: "https://github.com/davidcollom/komodor-klaudia-sync"
