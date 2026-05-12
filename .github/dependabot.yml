@@ -1,0 +1,31 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      all-github-actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: gomod
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      all-go-modules:
+        patterns:
+          - "*"
+
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      all-docker-dependencies:
+        patterns:
+          - "*"
