@@ -47,4 +47,4 @@ outputs:
 
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/davidcollom/komodor-klaudia-sync:v1'
+  image: 'docker://ghcr.io/davidcollom/komodor-klaudia-sync:vv1'
