@@ -1,6 +1,6 @@
 module github.com/davidcollom/komodor-klaudia-sync
 
-go 1.25.0
+go 1.26.3
 
 require (
 	github.com/hashicorp/go-retryablehttp v0.7.8
