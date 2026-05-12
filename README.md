@@ -8,7 +8,7 @@ It supports two remote file types:
 - `blueprint`
 
 For content guidance and structure expectations, see the Komodor reference:
-https://help.komodor.com/hc/en-us/articles/32463600112786-Klaudia-md-Organizational-Blueprint-Knowledge
+[Klaudia.md: Organizational Blueprint & Knowledge](https://help.komodor.com/hc/en-us/articles/32463600112786-Klaudia-md-Organizational-Blueprint-Knowledge)
 
 ## What It Does
 
@@ -181,4 +181,4 @@ Releases are built with GoReleaser and published to GitHub Releases and GHCR. Th
 
 ## License
 
-Apache 2.0
+Apache-2.0
