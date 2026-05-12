@@ -77,7 +77,7 @@ jobs:
                 echo "prerelease_channel must be set when release_type is prerelease"
                 exit 1
               fi
-              version="$(svu prerelease --prerelease "${prerelease_channel}.0")"
+              version="$(svu prerelease --prerelease "${prerelease_channel}")"
               ;;
             *)
               echo "unsupported release_type: $release_type"
@@ -88,8 +88,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          major_tag="v${version#v}"
-          major_tag="v${major_tag%%.*}"
+          major_tag="${version#v}"
+          major_tag="${major_tag%%.*}"
           echo "major_tag=$major_tag" >> "$GITHUB_OUTPUT"
 
       - name: Update action.yml image reference on main
@@ -127,10 +127,10 @@ jobs:
           git checkout -B main origin/main
           git tag "$version"
           git push origin "$version"
-          major_tag="v${version#v}"
-          major_tag="v${major_tag%%.*}"
-          git tag -f "$major_tag"
-          git push origin "$major_tag" --force
+          major_tag="${version#v}"
+          major_tag="${major_tag%%.*}"
+          git tag -f "${major_tag}"
+          git push origin "${major_tag}" --force
 
       - name: Checkout Release Tag
         uses: actions/checkout@v6
