@@ -66,13 +66,13 @@ func newSyncCmd() *cobra.Command {
 // and are resolved at execution time to avoid exposing secrets in --help output.
 func addSyncFlags(cmd *cobra.Command) {
 	cmd.Flags().String("directory", envOr("", "KLAUDIA_DIRECTORY", "INPUT_DIRECTORY"), "Directory to sync")
-	cmd.Flags().String("file-type", envOr(klaudia.FileTypeKnowledgeBase, "KLAUDIA_FILE_TYPE", "INPUT_FILE_TYPE"), "knowledge-base or blueprint")
+	cmd.Flags().String("file-type", envOr(klaudia.FileTypeKnowledgeBase, "KLAUDIA_FILE_TYPE", "INPUT_FILE_TYPE", "INPUT_FILE-TYPE"), "knowledge-base or blueprint")
 	cmd.Flags().String("api-key", "", "Komodor API key (or set KOMODOR_API_KEY)")
-	cmd.Flags().String("api-base-url", envOr(klaudia.DefaultAPIBaseURL, "KOMODOR_API_BASE_URL", "INPUT_API_BASE_URL"), "Komodor API base URL")
+	cmd.Flags().String("api-base-url", envOr(klaudia.DefaultAPIBaseURL, "KOMODOR_API_BASE_URL", "INPUT_API_BASE_URL", "INPUT_API-BASE-URL"), "Komodor API base URL")
 	cmd.Flags().Bool("recursive", envBool(true, "KLAUDIA_RECURSIVE", "INPUT_RECURSIVE"), "Recurse into subdirectories")
-	cmd.Flags().Bool("dry-run", envBool(false, "KLAUDIA_DRY_RUN", "INPUT_DRY_RUN"), "Preview changes without applying them")
+	cmd.Flags().Bool("dry-run", envBool(false, "KLAUDIA_DRY_RUN", "INPUT_DRY_RUN", "INPUT_DRY-RUN"), "Preview changes without applying them")
 	cmd.Flags().Bool("debug", envBool(false, "KLAUDIA_DEBUG", "INPUT_DEBUG"), "Enable debug logging")
-	cmd.Flags().String("file-extensions", envOr("", "KLAUDIA_FILE_EXTENSIONS", "INPUT_FILE_EXTENSIONS"), "Comma-separated extension allowlist")
+	cmd.Flags().String("file-extensions", envOr("", "KLAUDIA_FILE_EXTENSIONS", "INPUT_FILE_EXTENSIONS", "INPUT_FILE-EXTENSIONS"), "Comma-separated extension allowlist")
 }
 
 func runSync(cmd *cobra.Command) error {
@@ -83,7 +83,7 @@ func runSync(cmd *cobra.Command) error {
 	apiKey, _ := flags.GetString("api-key")
 	// Fall back to environment variable so Docker/CI callers can pass via env only.
 	if strings.TrimSpace(apiKey) == "" {
-		apiKey = envOr("", "KOMODOR_API_KEY", "INPUT_API_KEY")
+		apiKey = envOr("", "KOMODOR_API_KEY", "INPUT_API_KEY", "INPUT_API-KEY")
 	}
 	apiBaseURL, _ := flags.GetString("api-base-url")
 	recursive, _ := flags.GetBool("recursive")
