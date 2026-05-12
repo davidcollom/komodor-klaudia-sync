@@ -26,6 +26,7 @@ on:
 permissions:
   contents: write
   packages: write
+  id-token: write
 
 jobs:
   release:
@@ -97,9 +98,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          major_tag="${version#v}"
+          major_tag="v${version#v}"
           major_tag="${major_tag%%.*}"
           echo "major_tag=$major_tag" >> "$GITHUB_OUTPUT"
+          minor_tag="v${version#v}"
+          minor_tag="$(echo "$minor_tag" | cut -d. -f1-2)"
+          echo "minor_tag=$minor_tag" >> "$GITHUB_OUTPUT"
 
       - name: Update action.yml image reference on main
         shell: bash
@@ -136,7 +140,7 @@ jobs:
           git checkout -B main origin/main
           git tag "$version"
           git push origin "$version"
-          major_tag="${version#v}"
+          major_tag="v${version#v}"
           major_tag="${major_tag%%.*}"
           git tag -f "${major_tag}"
           git push origin "${major_tag}" --force
@@ -150,4 +154,5 @@ jobs:
       - name: Run GoReleaser
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COSIGN_YES: "true"
         run: goreleaser release --clean

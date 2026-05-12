@@ -62,8 +62,7 @@ changelog:
   sort: asc
 
 signs:
-  - id: checksum-signature
-    artifacts: checksum
+  - artifacts: all
     cmd: cosign
     args:
       - sign-blob
