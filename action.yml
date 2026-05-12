@@ -1,0 +1,50 @@
+name: 'Klaudia Sync Action'
+description: 'Sync a directory to Komodor Klaudia (knowledge-base or blueprint) with full CRUD operations'
+
+inputs:
+  directory:
+    description: 'Local directory path to sync'
+    required: true
+  file-type:
+    description: 'Type of files being synced: knowledge-base or blueprint'
+    required: true
+    default: 'knowledge-base'
+  api-key:
+    description: 'Komodor API key'
+    required: true
+  api-base-url:
+    description: 'Komodor API base URL'
+    required: false
+    default: 'https://api.komodor.com'
+  recursive:
+    description: 'Whether to recursively sync subdirectories'
+    required: false
+    default: 'true'
+  dry-run:
+    description: 'If true, log changes without applying them'
+    required: false
+    default: 'false'
+  debug:
+    description: 'Enable debug logging'
+    required: false
+    default: 'false'
+  file-extensions:
+    description: 'Comma-separated list of file extensions to sync (e.g., .md,.txt). Unsupported formats are always skipped. Supported: .md/.markdown, .pdf, .txt, .doc/.docx, .csv, .json, .yaml/.yml. Files over 52.4 MB fail the run.'
+    required: false
+    default: ''
+
+outputs:
+  summary:
+    description: 'Summary of sync operation'
+  files-uploaded:
+    description: 'Number of files uploaded'
+  files-updated:
+    description: 'Number of files updated'
+  files-deleted:
+    description: 'Number of files deleted'
+  operation-log:
+    description: 'Detailed operation log'
+
+runs:
+  using: 'docker'
+  image: 'docker://ghcr.io/davidcollom/komodor-klaudia-sync:v1'

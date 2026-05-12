@@ -1,0 +1,59 @@
+version: 2
+project_name: komodor-klaudia-sync
+
+before:
+  hooks:
+    - go mod tidy
+    - go test ./...
+
+builds:
+  - id: komodor-klaudia-sync
+    binary: klaudia-sync
+    main: ./cmd/klaudia-sync
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/davidcollom/komodor-klaudia-sync/internal/version.Version={{.Version}}
+      - -X github.com/davidcollom/komodor-klaudia-sync/internal/version.Commit={{.Commit}}
+      - -X github.com/davidcollom/komodor-klaudia-sync/internal/version.Date={{.Date}}
+
+archives:
+  - id: binaries
+    formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: checksums.txt
+
+dockers_v2:
+  - id: komodor-klaudia-sync-image
+    ids:
+      - komodor-klaudia-sync
+    images:
+      - ghcr.io/davidcollom/komodor-klaudia-sync:v{{ .Version }}
+      - ghcr.io/davidcollom/komodor-klaudia-sync:v{{ .Major }}
+      - ghcr.io/davidcollom/komodor-klaudia-sync:v{{ .Major }}.{{ .Minor }}
+      - "{{ if not .Prerelease }}ghcr.io/davidcollom/komodor-klaudia-sync:latest{{ end }}"
+    dockerfile: Dockerfile
+    labels:
+      org.opencontainers.image.title: "komodor-klaudia-sync"
+      org.opencontainers.image.source: "https://github.com/davidcollom/komodor-klaudia-sync"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.version: "{{ .Version }}"
+
+release:
+  draft: false
+  replace_existing_draft: true
+  mode: replace
+
+changelog:
+  use: github
+  sort: asc

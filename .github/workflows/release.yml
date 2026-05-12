@@ -1,0 +1,144 @@
+name: Release Klaudia Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: Release type to publish
+        required: true
+        default: patch
+        type: choice
+        options:
+          - auto
+          - major
+          - minor
+          - patch
+          - prerelease
+      prerelease_channel:
+        description: Prerelease channel to use when release_type is prerelease
+        required: false
+        type: choice
+        options:
+          - alpha
+          - beta
+          - rc
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Install svu
+        run: go install github.com/caarlos0/svu/v3@latest
+
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v7
+        with:
+          install-only: true
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine next release version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_type='${{ inputs.release_type }}'
+          prerelease_channel='${{ inputs.prerelease_channel }}'
+
+          case "$release_type" in
+            auto)
+              version="$(svu next)"
+              ;;
+            major|minor|patch)
+              version="$(svu "$release_type")"
+              ;;
+            prerelease)
+              if [[ -z "$prerelease_channel" ]]; then
+                echo "prerelease_channel must be set when release_type is prerelease"
+                exit 1
+              fi
+              version="$(svu prerelease --prerelease "${prerelease_channel}.0")"
+              ;;
+            *)
+              echo "unsupported release_type: $release_type"
+              exit 1
+              ;;
+          esac
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          major_tag="v${version#v}"
+          major_tag="v${major_tag%%.*}"
+          echo "major_tag=$major_tag" >> "$GITHUB_OUTPUT"
+
+      - name: Update action.yml image reference on main
+        shell: bash
+        run: |
+          set -euo pipefail
+          major_tag='${{ steps.version.outputs.major_tag }}'
+
+          git fetch origin main
+          git checkout -B main origin/main
+
+          # Prepare main so the release tag points at the commit containing the
+          # current major image reference.
+          sed -i "s|image: 'Dockerfile'|image: 'docker://ghcr.io/davidcollom/komodor-klaudia-sync:${major_tag}'|" action.yml
+          sed -i "s|image: 'docker://ghcr.io/davidcollom/komodor-klaudia-sync:v[0-9]*'|image: 'docker://ghcr.io/davidcollom/komodor-klaudia-sync:${major_tag}'|" action.yml
+
+          if git diff --quiet action.yml; then
+            echo "action.yml already references ${major_tag} — no update needed"
+            exit 0
+          fi
+
+          git add action.yml
+          git commit -m "chore: update action.yml image reference to ${major_tag} [skip ci]"
+          git push origin main
+
+
+      - name: Create and push release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          version='${{ steps.version.outputs.version }}'
+
+          # Tag the main branch after any action.yml update commit so the tag
+          # contains the correct action metadata.
+          git checkout -B main origin/main
+          git tag "$version"
+          git push origin "$version"
+          major_tag="v${version#v}"
+          major_tag="v${major_tag%%.*}"
+          git tag -f "$major_tag"
+          git push origin "$major_tag" --force
+
+      - name: Checkout Release Tag
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: "${{ steps.version.outputs.version }}"
+
+      - name: Run GoReleaser
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: goreleaser release --clean
