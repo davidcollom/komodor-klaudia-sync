@@ -50,7 +50,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@v4
+        uses: sigstore/cosign-installer@v3
 
       - name: Install svu
         run: go install github.com/caarlos0/svu/v3@latest
