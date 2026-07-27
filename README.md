@@ -1,6 +1,6 @@
 # Klaudia Sync
 
-`klaudia-sync` is a Go CLI and Docker-based GitHub Action for synchronising local documentation into Komodor Klaudia with full CRUD behaviour.
+`klaudia-sync` is a Go CLI and Docker-based sync tool for synchronising local documentation into Komodor Klaudia with full CRUD behaviour.
 
 It supports two remote file types:
 
@@ -134,6 +134,63 @@ Blueprint example:
     debug: 'true'
 ```
 
+## Other CI/CD Systems
+
+The same container can run outside GitHub Actions in any CI/CD system that can execute Docker containers or the Go CLI. The examples below use the published GHCR image `ghcr.io/davidcollom/komodor-klaudia-sync:v1`, which matches the image consumed by the action.
+
+CircleCI:
+
+```yaml
+version: 2.1
+
+jobs:
+  sync-klaudia:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Sync knowledge base
+          command: |
+            docker run --rm \
+              -e KOMODOR_API_KEY="$KOMODOR_API_KEY" \
+              -e KLAUDIA_DIRECTORY=/workspace/example/kb \
+              -e KLAUDIA_FILE_TYPE=knowledge-base \
+              -v "$PWD:/workspace" \
+              ghcr.io/davidcollom/komodor-klaudia-sync:v1
+```
+
+Buildkite:
+
+```yaml
+steps:
+  - label: "Sync Klaudia"
+    command: |
+      docker run --rm \
+        -e KOMODOR_API_KEY="$$KOMODOR_API_KEY" \
+        -e KLAUDIA_DIRECTORY=/workspace/example/blueprints \
+        -e KLAUDIA_FILE_TYPE=blueprint \
+        -v "$$PWD:/workspace" \
+        ghcr.io/davidcollom/komodor-klaudia-sync:v1
+```
+
+Harness:
+
+```yaml
+steps:
+  - step:
+      type: Run
+      name: Sync Klaudia
+      spec:
+        image: ghcr.io/davidcollom/komodor-klaudia-sync:v1
+        shell: Sh
+        envVariables:
+          KOMODOR_API_KEY: <+secrets.getValue("komodor_api_key")>
+          KLAUDIA_DIRECTORY: /harness/example/kb
+          KLAUDIA_FILE_TYPE: knowledge-base
+```
+
 ## Inputs
 
 | Input | Description | Required | Default |
@@ -172,7 +229,7 @@ api GET /api/v2/klaudia/files/blueprint failed with 400 Bad Request (400): bad r
 
 ## Release Notes
 
-Releases are built with GoReleaser and published to GitHub Releases and GHCR. The GitHub Action references the floating major image tag, which is updated by the release workflow before tagging.
+Releases are built with GoReleaser and published to GitHub Releases and GHCR. The GitHub Action and other CI/CD integrations can reference the published container image tags directly.
 
 ## Repository Examples
 
