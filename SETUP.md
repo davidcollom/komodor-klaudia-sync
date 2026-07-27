@@ -1,9 +1,9 @@
-# Klaudia Sync Go CLI and Docker Action
+# Klaudia Sync Go CLI and GitHub Action
 
 [![GitHub Action](https://img.shields.io/badge/GitHub-Action-blue.svg)](https://github.com/komodorio/custom-komodor-integrations/tree/master/klaudia-sync-action)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-A production-grade Go sync tool for Komodor's Klaudia API with **full CRUD operations**, detailed logging, and CI/CD integration. The same code runs as a Docker action, a standalone container, and a local CLI.
+A production-grade Go sync tool for Komodor's Klaudia API with **full CRUD operations**, detailed logging, and CI/CD integration. The same code runs as a GitHub Action, a standalone container, and a local CLI.
 
 ## ✨ Key Features
 
@@ -111,7 +111,7 @@ Buildkite:
 
 ```yaml
 steps:
-  - label: ":komodor: Sync Klaudia"
+  - label: "Sync Klaudia"
     command: |
       docker run --rm \
         -e KOMODOR_API_KEY="$$KOMODOR_API_KEY" \

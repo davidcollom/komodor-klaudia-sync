@@ -165,7 +165,7 @@ Buildkite:
 
 ```yaml
 steps:
-  - label: ":komodor: Sync Klaudia"
+  - label: "Sync Klaudia"
     command: |
       docker run --rm \
         -e KOMODOR_API_KEY="$$KOMODOR_API_KEY" \
