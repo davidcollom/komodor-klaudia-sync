@@ -3,7 +3,7 @@
 [![GitHub Action](https://img.shields.io/badge/GitHub-Action-blue.svg)](https://github.com/komodorio/custom-komodor-integrations/tree/master/klaudia-sync-action)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-A production-grade Go sync tool for Komodor's Klaudia API with **full CRUD operations**, detailed logging, and CI/CD integration. The same code runs as a Docker action and as a local CLI.
+A production-grade Go sync tool for Komodor's Klaudia API with **full CRUD operations**, detailed logging, and CI/CD integration. The same code runs as a Docker action, a standalone container, and a local CLI.
 
 ## ✨ Key Features
 
@@ -82,7 +82,62 @@ docker build -t klaudia-sync-action .
 docker run --rm -e KOMODOR_API_KEY="$KOMODOR_API_KEY" -e KLAUDIA_DIRECTORY=/workspace/kb -e KLAUDIA_FILE_TYPE=knowledge-base -v "$PWD:/workspace" klaudia-sync-action
 ```
 
-### 4. Push Your Changes
+### 4. Run in Other CI/CD Systems
+
+CircleCI:
+
+```yaml
+version: 2.1
+
+jobs:
+  sync-klaudia:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Sync Klaudia
+          command: |
+            docker run --rm \
+              -e KOMODOR_API_KEY="$KOMODOR_API_KEY" \
+              -e KLAUDIA_DIRECTORY=/workspace/kb \
+              -e KLAUDIA_FILE_TYPE=knowledge-base \
+              -v "$PWD:/workspace" \
+              ghcr.io/davidcollom/komodor-klaudia-sync:v1
+```
+
+Buildkite:
+
+```yaml
+steps:
+  - label: ":komodor: Sync Klaudia"
+    command: |
+      docker run --rm \
+        -e KOMODOR_API_KEY="$$KOMODOR_API_KEY" \
+        -e KLAUDIA_DIRECTORY=/workspace/blueprints \
+        -e KLAUDIA_FILE_TYPE=blueprint \
+        -v "$$PWD:/workspace" \
+        ghcr.io/davidcollom/komodor-klaudia-sync:v1
+```
+
+Harness:
+
+```yaml
+steps:
+  - step:
+      type: Run
+      name: Sync Klaudia
+      spec:
+        image: ghcr.io/davidcollom/komodor-klaudia-sync:v1
+        shell: Sh
+        envVariables:
+          KOMODOR_API_KEY: <+secrets.getValue("komodor_api_key")>
+          KLAUDIA_DIRECTORY: /harness/kb
+          KLAUDIA_FILE_TYPE: knowledge-base
+```
+
+### 5. Push Your Changes
 
 ```bash
 git add kb/
