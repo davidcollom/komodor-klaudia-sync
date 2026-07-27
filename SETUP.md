@@ -1,4 +1,4 @@
-# Klaudia Sync Go CLI and GitHub Action
+# Klaudia Sync Go CLI, Container, and GitHub Action
 
 [![GitHub Action](https://img.shields.io/badge/GitHub-Action-blue.svg)](https://github.com/komodorio/custom-komodor-integrations/tree/master/klaudia-sync-action)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
@@ -83,6 +83,8 @@ docker run --rm -e KOMODOR_API_KEY="$KOMODOR_API_KEY" -e KLAUDIA_DIRECTORY=/work
 ```
 
 ### 4. Run in Other CI/CD Systems
+
+The examples below use the published GHCR image `ghcr.io/davidcollom/komodor-klaudia-sync:v1`. The local Docker example above builds the same code into a local image named `klaudia-sync-action`.
 
 CircleCI:
 

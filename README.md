@@ -136,7 +136,7 @@ Blueprint example:
 
 ## Other CI/CD Systems
 
-The same container can run outside GitHub Actions in any CI/CD system that can execute Docker containers or the Go CLI.
+The same container can run outside GitHub Actions in any CI/CD system that can execute Docker containers or the Go CLI. The examples below use the published GHCR image `ghcr.io/davidcollom/komodor-klaudia-sync:v1`, which matches the image consumed by the action.
 
 CircleCI:
 
